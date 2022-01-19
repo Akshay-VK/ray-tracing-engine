@@ -6,9 +6,15 @@ import 'dart:io';
 import 'package:image/image.dart';
 
 vec3 ray_color(ray r){
+  double t = ray.hit_sphere(new vec3(0.0,0.0,-1.0),0.5,r);
+
+  if(t>0.0){
+    vec3 N = (r.at(t)-new vec3(0.0,0.0,-1.0)).normalize();
+    return new vec3(N.x+1,N.y+1,N.z+1).mult(0.5);
+  }
   vec3 rDir = r.direction;
   vec3 unit_dir=rDir.normalize();
-  double t = 0.5*(unit_dir.y+1.0);
+  t = 0.5*(unit_dir.y+1.0);
   vec3 cA=new vec3(1.0-t,1.0-t,1.0-t);
   vec3 cB=new vec3(0.5*t,0.7*t,1.0*t);
   return cA+cB;
