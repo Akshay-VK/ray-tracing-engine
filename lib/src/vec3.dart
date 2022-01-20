@@ -8,44 +8,44 @@ class vec3{
     this.z=z;
   }
   double get length_squared{
-    return this.x*this.x+this.y*this.y+this.z*this.z;
+    return x*x+y*y+z*z;
   }
   double get length{
-    return sqrt(this.length_squared);
+    return sqrt(length_squared);
   }
   vec3 operator +(vec3 b){
-    return new vec3(this.x+b.x,this.y+b.y,this.z+b.z);
+    return vec3(x+b.x,y+b.y,z+b.z);
   }
   vec3 add(double a){
-    return new vec3(this.x+a,this.y+a,this.z+a);
+    return vec3(x+a,y+a,z+a);
   }
   vec3 operator -(vec3 b){
-    return new vec3(this.x-b.x,this.y-b.y,this.z-b.z);
+    return vec3(x-b.x,y-b.y,z-b.z);
   }
   vec3 sub(double a){
-    return new vec3(this.x-a,this.y-a,this.z-a);
+    return vec3(x-a,y-a,z-a);
   }
   vec3 operator *(vec3 b){
-    return new vec3(this.x*b.x,this.y*b.y,this.z*b.z);
+    return vec3(x*b.x,y*b.y,z*b.z);
   }
   vec3 mult(double a){
-    return new vec3(this.x*a,this.y*a,this.z*a);
+    return vec3(x*a,y*a,z*a);
   }
   vec3 operator /(vec3 b){
-    return new vec3(this.x/b.x,this.y/b.y,this.z/b.z);
+    return vec3(x/b.x,y/b.y,z/b.z);
   }
   vec3 div(double a){
-    return new vec3(this.x/a,this.y/a,this.z/a);
+    return vec3(x/a,y/a,z/a);
   }
   vec3 normalize(){
-    double l = this.length;
-    return new vec3(this.x/l,this.y/l,this.z/l);
+    var l = length;
+    return vec3(x/l,y/l,z/l);
   }
   void normalizeSelf(){
-    double l = this.length;
-    this.x/=l;
-    this.y/=l;
-    this.z/=l;
+    var l = length;
+    x/=l;
+    y/=l;
+    z/=l;
   }
   static double dot(vec3 a,vec3 b){
     return a.x*b.x+a.y*b.y+a.z*b.z;

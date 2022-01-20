@@ -1,51 +1,62 @@
 library ray_tracing_engine;
 
+import 'package:ray_tracing_engine/src/constants.dart';
+import 'package:ray_tracing_engine/src/hittable.dart';
+import 'package:ray_tracing_engine/src/hittable_list.dart';
+import 'package:ray_tracing_engine/src/surfaces/sphere.dart';
 import 'package:ray_tracing_engine/src/vec3.dart';
 import 'package:ray_tracing_engine/src/ray.dart';
 import 'dart:io';
 import 'package:image/image.dart';
 
-vec3 ray_color(ray r){
-  double t = ray.hit_sphere(new vec3(0.0,0.0,-1.0),0.5,r);
-
-  if(t>0.0){
-    vec3 N = (r.at(t)-new vec3(0.0,0.0,-1.0)).normalize();
-    return new vec3(N.x+1,N.y+1,N.z+1).mult(0.5);
+vec3 ray_color(ray r, hittable world){
+  var rec = hit_record();
+  if(world.hit(r, 0, INFINITY, rec)){
+    return (rec.normal + vec3(1,1,1)).mult(0.5);
   }
-  vec3 rDir = r.direction;
-  vec3 unit_dir=rDir.normalize();
-  t = 0.5*(unit_dir.y+1.0);
-  vec3 cA=new vec3(1.0-t,1.0-t,1.0-t);
-  vec3 cB=new vec3(0.5*t,0.7*t,1.0*t);
+  var rDir = r.direction;
+  var unit_dir=rDir.normalize();
+
+  var t = 0.5*(unit_dir.y+1.0);
+  var cA=vec3(1.0-t,1.0-t,1.0-t);
+  var cB=vec3(0.5*t,0.7*t,1.0*t);
   return cA+cB;
 }
 
 void run(){
   print('Initializing vars...');
-  double aspect_ratio = 16.0/9.0;
-  int img_width=400;
-  int img_height = (img_width / aspect_ratio).toInt();
+  //Image
+  var aspect_ratio = 16.0/9.0;
+  var img_width=400;
+  var img_height = img_width ~/ aspect_ratio;
 
-  double viewport_height = 2.0;
-  double viewport_width = aspect_ratio * viewport_height;
-  double focal_length = 1.0;
+  //World
+  var world = hittable_list();
+  world.add(sphere(vec3(0,0,-1),0.5));
+  world.add(sphere(vec3(0,-100.5,-1), 100));
 
-  vec3 origin = new vec3(0.0,0.0,0.0);
-  vec3 hor = new vec3(viewport_width,0.0,0.0);
-  vec3 vert = new vec3(0.0,viewport_height,0.0);
-  vec3 Zfoc_len = new vec3(0,0,focal_length);
-  vec3 lower_left_corner = origin - hor.div(2.0) - vert.div(2.0) - Zfoc_len;
+  //Camera
+  var viewport_height = 2.0;
+  var viewport_width = aspect_ratio * viewport_height;
+  var focal_length = 1.0;
 
+  var origin = vec3(0.0,0.0,0.0);
+  var hor = vec3(viewport_width,0.0,0.0);
+  var vert = vec3(0.0,viewport_height,0.0);
+  var Zfoc_len = vec3(0,0,focal_length);
+  var lower_left_corner = origin - hor.div(2.0) - vert.div(2.0) - Zfoc_len;
+
+  //Render
   print('Initializing image...');
-  Image img = new Image(img_width,img_height);
+  var img = Image(img_width,img_height);
   fill(img, getColor(0, 255, 0));
   print('Ray tracing...');
-  for (int j = img_height-1; j >= 0; --j) {
-    for (int i = 0; i < img_width; ++i) {
-      double u = i / (img_width-1);
-      double v = j / (img_height-1);
-      ray r = new ray(origin, lower_left_corner + hor.mult(u) + vert.mult(v) - origin);
-      vec3 pixel_color = ray_color(r);
+  for (var j = img_height-1; j >= 0; --j) {
+    for (var i = 0; i < img_width; ++i) {
+      var u = i / (img_width-1);
+      var v = j / (img_height-1);
+      var r = ray(origin, lower_left_corner + hor.mult(u) + vert.mult(v) - origin);
+      var pixel_color = ray_color(r,world);
       drawPixel(
         img,
 	i,
